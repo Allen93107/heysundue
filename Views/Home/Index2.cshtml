@@ -1,9 +1,7 @@
 @{
-    // 使用預設的佈局
-    Layout = "~/Views/Shared/_Layout.cshtml";
-
     // 使用 Session 獲取圖片
-    var selectedImage = Context.Session.GetString("Favicon") ?? "default.jpg";  // 如果 Session 没有值，使用默认图片
+    var selectedBanner = Context.Session.GetString("Favicon") ?? "default.jpg"; // 如果 Session 沒有值，使用默認 Banner
+    var selectedMap = Context.Session.GetString("Map") ?? "default_map.jpg"; // 如果 Session 沒有值，使用默認地圖
 }
 
 <!DOCTYPE html>
@@ -13,25 +11,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="~/css/Index.css">
-    <title>Welcome to Your Website</title>
+    <title>Index2</title>
+    <style>
+        /* 全屏地圖的樣式 */
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fullscreen img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
 </head>
 
 <body>
-
     <main>
         <div class="container mt-5">
+            <!-- 顯示 Banner -->
             <div class="row justify-content-center">
                 <div class="col-md-6 text-center">
-                    <!-- 動態顯示選擇的圖片 -->
-                    <img src="/images/@selectedImage" alt="heart" class="heart">
-                    <h2>Welcome to Your Website</h2>
-                    <p>This is the content area.</p>
+                    <h2>Banner</h2>
+                    <img src="/images/@selectedBanner" alt="Banner" class="img-fluid mb-4" style="max-width: 100%;">
+                </div>
+            </div>
+
+            <!-- 顯示地圖 -->
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <h2>地圖</h2>
+                    <img src="/images/@selectedMap" alt="地圖" class="img-fluid mb-3 map-image" style="max-width: 50%; cursor: pointer;" onclick="toggleFullScreen(this)">
                 </div>
             </div>
         </div>
     </main>
 
+    <script>
+        function toggleFullScreen(image) {
+            // 檢查當前是否處於全屏模式
+            if (!document.fullscreenElement) {
+                // 創建一個包裹層來放置圖片
+                const fullscreenDiv = document.createElement("div");
+                fullscreenDiv.classList.add("fullscreen");
+
+                // 複製圖片到全屏層
+                const fullScreenImage = document.createElement("img");
+                fullScreenImage.src = image.src;
+
+                // 添加事件，點擊退出全屏
+                fullscreenDiv.onclick = () => {
+                    document.exitFullscreen();
+                    fullscreenDiv.remove();
+                };
+
+                // 將圖片添加到包裹層並進入全屏
+                fullscreenDiv.appendChild(fullScreenImage);
+                document.body.appendChild(fullscreenDiv);
+                fullscreenDiv.requestFullscreen();
+            } else {
+                // 如果已經是全屏，退出全屏
+                document.exitFullscreen();
+            }
+        }
+    </script>
 </body>
 
 </html>

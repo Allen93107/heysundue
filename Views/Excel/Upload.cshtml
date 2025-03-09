@@ -1,0 +1,109 @@
+@{
+    ViewData["Title"] = "Upload and Process Excel";
+}
+
+<h2>Upload and Process Excel File</h2>
+
+<!-- Excel 上傳表單 -->
+<form asp-controller="Excel" asp-action="UploadExcel" enctype="multipart/form-data" method="post">
+    <div class="form-group">
+        <label for="fileUpload">Upload Excel File</label>
+        <input type="file" class="form-control" name="fileUpload" id="fileUpload" />
+    </div>
+    <div class="form-group mt-3">
+        <label for="target">選擇目標資料庫</label>
+        <select id="target" name="target" class="form-control">
+            <option value="joinlist">Joinlist</option>
+            <option value="sessionuser">Sessionuser</option>
+        </select>
+    </div>
+    <div class="form-group mt-3" id="meetingSelectGroup" style="display: none;">
+        <label for="uploadMeetingId">選擇會議</label>
+        <select id="uploadMeetingId" name="meetingId" class="form-control"></select>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Upload</button>
+</form>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<h2>Download Current Data</h2>
+
+<!-- 選擇目標資料庫 -->
+<div class="form-group">
+    <label for="downloadTarget">選擇目標資料庫</label>
+    <select id="downloadTarget" class="form-control">
+        <option value="joinlist">Joinlist</option>
+        <option value="sessionuser">Sessionuser</option>
+    </select>
+</div>
+
+<!-- 會議選項（僅在選擇 Sessionuser 時顯示） -->
+<div class="form-group mt-3" id="downloadMeetingSelectGroup" style="display: none;">
+    <label for="downloadMeetingId">選擇下載會議</label>
+    <select id="downloadMeetingId" class="form-control"></select>
+</div>
+
+<button id="downloadBtn" class="btn btn-success mt-3">Download Excel</button>
+
+<!-- jQuery 加載和 Ajax 呼叫 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // 動態顯示或隱藏會議選項
+        $('#target').change(function () {
+            if ($(this).val() === 'sessionuser') {
+                $('#meetingSelectGroup').show();
+                loadMeetingOptions('#uploadMeetingId');
+            } else {
+                $('#meetingSelectGroup').hide();
+            }
+        });
+
+        $('#downloadTarget').change(function () {
+            if ($(this).val() === 'sessionuser') {
+                $('#downloadMeetingSelectGroup').show();
+                loadMeetingOptions('#downloadMeetingId');
+            } else {
+                $('#downloadMeetingSelectGroup').hide();
+            }
+        });
+
+        // 加載會議選項
+        function loadMeetingOptions(selectId) {
+            $.getJSON('/Sessionuser/GetMeetings', function (data) {
+                let select = $(selectId);
+                select.empty();
+                if (data && data.length > 0) {
+                    select.append(new Option("請選擇會議", ""));
+                    $.each(data, function (index, meeting) {
+                        select.append(new Option(meeting.title, meeting.id));
+                    });
+                } else {
+                    select.append(new Option("無會議", ""));
+                }
+            }).fail(function () {
+                alert("無法加載會議列表。");
+            });
+        }
+
+        // 下載 Excel 資料
+        $('#downloadBtn').click(function () {
+            let target = $('#downloadTarget').val();
+            if (target === 'sessionuser') {
+                let meetingId = $('#downloadMeetingId').val();
+                if (meetingId) {
+                    window.location.href = '/Excel/ExportToExcel?target=' + target + '&meetingId=' + meetingId;
+                } else {
+                    alert("請先選擇會議。");
+                }
+            } else {
+                window.location.href = '/Excel/ExportToExcel?target=' + target;
+            }
+        });
+    });
+</script>

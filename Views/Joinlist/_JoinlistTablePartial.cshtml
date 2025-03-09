@@ -1,0 +1,50 @@
+@model Heysundue.Models.Joinlist2ViewModel
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Reg. No.</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>中文姓名</th>
+            <th>Country</th>
+            <th>報到狀態</th>
+            <th>Barcode</th>
+            <th>Email</th>
+            <th>City</th>
+            <th>身份別一</th>
+            <th>身份別二</th>
+            <th>身份證號碼</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Joinlists != null && Model.Joinlists.Any())
+        {
+            foreach (var joinlist in Model.Joinlists)
+            {
+                <tr>
+                    <td>@joinlist.RegNo</td>
+                    <td>@joinlist.FirstName</td>
+                    <td>@joinlist.LastName</td>
+                    <td>@joinlist.ChineseName</td>
+                    <td>@joinlist.Country</td>
+                    <td>@joinlist.RegistrationStatus</td>
+                    <td>@joinlist.Barcode</td>
+                    <td>@joinlist.Email</td>
+                    <td>@joinlist.City</td>
+                    <td>@joinlist.IdentityType1</td>
+                    <td>@joinlist.IdentityType2</td>
+                    <td>@joinlist.IDNumber</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="12">No joinlists available.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Heysundue.Models;
-
 public class ArticleContext : DbContext
 {
     public ArticleContext(DbContextOptions<ArticleContext> options)
@@ -15,24 +14,31 @@ public class ArticleContext : DbContext
     public DbSet<Article> Article { get; set; } = default!;
     public DbSet<Person> Persons { get; set; } = default!;
     public DbSet<Member> Members { get; set; } = default!;
-
     public DbSet<Registration> Registrations { get; set; } = default!;
-
     public DbSet<Login> Login { get; set; } = default!;
-
     public DbSet<Joinlist> Joinlists { get; set; } = default!;
-   protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public DbSet<Sessionuser> Sessionusers { get; set; } = default!;
+    public DbSet<Doorsystem> Doorsystems { get; set; } = default!;
+    public DbSet<Meeting> Meetings { get; set; }
+    public DbSet<Accessdoor> Accessdoors { get; set; } = default!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // 配置 Login 实体为无键实体
+        // Configure Login as a keyless entity
         modelBuilder.Entity<Login>().HasNoKey();
 
-        // 你可以在這裡添加其他實體的配置，如果有需要
-        // 例如，如果某個實體需要其他特殊配置，也可以在這裡進行設定
+        // Configure the relationship between Sessionuser and Meeting with cascade delete
+        modelBuilder.Entity<Sessionuser>()
+            .HasOne<Meeting>()
+            .WithMany(m => m.Sessionusers)
+            .HasForeignKey(s => s.MeetingID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Add other entity configurations here if needed
 
         base.OnModelCreating(modelBuilder);
     }
-    public DbSet<Doorsystem>  Doorsystems { get; set; } = default!;
-
-    public DbSet<Accessdoor> Accessdoors { get; set; } = default!;
-
+    
+        private readonly string _connectionString;
 }
+

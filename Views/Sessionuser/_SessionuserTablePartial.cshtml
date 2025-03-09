@@ -1,0 +1,34 @@
+@model Heysundue.Models.SessionuserViewModel
+
+<table class="table table-striped table-bordered">
+    <tbody>
+        @if (Model.Sessionusers != null && Model.Sessionusers.Any())
+        {
+            foreach (var sessionuser in Model.Sessionusers)
+            {
+                <tr>
+                    <td><input type="text" value="@sessionuser.RegNo" class="form-control" data-field="RegNo" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.FirstName" class="form-control" data-field="FirstName" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.LastName" class="form-control" data-field="LastName" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.ChineseName" class="form-control" data-field="ChineseName" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.Country" class="form-control" data-field="Country" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.RegistrationStatus" class="form-control" data-field="RegistrationStatus" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.Barcode" class="form-control" data-field="Barcode" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.Email" class="form-control" data-field="Email" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.City" class="form-control" data-field="City" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.IdentityType1" class="form-control" data-field="IdentityType1" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.IdentityType2" class="form-control" data-field="IdentityType2" data-id="@sessionuser.ID" disabled /></td>
+                    <td><input type="text" value="@sessionuser.IDNumber" class="form-control" data-field="IDNumber" data-id="@sessionuser.ID" disabled /></td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="12">No sessionusers available.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

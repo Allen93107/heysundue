@@ -6,17 +6,118 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
+
 
 namespace Heysundue.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ArticleContext _context;
+        private readonly ICompositeViewEngine _viewEngine;
+        private readonly IServiceProvider _serviceProvider;
 
-        public HomeController(ArticleContext context)
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ArticleContext context , ICompositeViewEngine viewEngine, IServiceProvider serviceProvider, ILogger<HomeController> logger)
         {
             _context = context;
+        _viewEngine = viewEngine;  // 将参数正确赋值给字段
+        _serviceProvider = serviceProvider;  // 将参数正确赋值给字段
+        _logger = logger;
+        }        
+[HttpGet]
+public async Task<IActionResult> CheckUpcomingMeetings()
+{
+    var currentTime = DateTime.Now;
+
+    var upcomingMeetings = await _context.Meetings
+        .Where(m => m.MeetingDateTime >= currentTime && m.MeetingDateTime <= currentTime.AddMinutes(30))
+        .Select(m => new
+        {
+            Title = m.Title,
+            MeetingDateTime = m.MeetingDateTime,
+            Place = m.Place, // 確認這裡是否有正確傳遞
+            Speaker = m.Sessionusers
+                .Where(s => s.Speaker != null && s.MeetingID == m.ID)
+                .Select(s => new
+                {
+                    ChineseName = s.ChineseName,
+                    Phone = s.Phone
+                })
+                .FirstOrDefault()
+        })
+        .ToListAsync();
+
+    _logger.LogInformation("Upcoming Meetings Data: {0}", JsonSerializer.Serialize(upcomingMeetings));
+
+    return Json(upcomingMeetings);
+}
+[HttpPost]
+public IActionResult UpdateSpeakersForYesterdayEndedMeetings()
+{
+    var yesterday = DateTime.Now.AddDays(-1).Date;
+
+    // 查詢昨天結束的會議
+    var endedMeetings = _context.Meetings
+        .Where(m => m.MeetingDateTime.Date == yesterday)
+        .ToList();
+
+    if (!endedMeetings.Any())
+    {
+        return Json(new { success = false, message = "昨天沒有已結束的會議。" });
+    }
+
+    foreach (var meeting in endedMeetings)
+    {
+        // 更新會議成員 speaker 為 "普通成員"
+        var sessionUsers = _context.Sessionusers
+            .Where(s => s.MeetingID == meeting.ID && s.Speaker != "普通成員")
+            .ToList();
+
+        foreach (var user in sessionUsers)
+        {
+            user.Speaker = "普通成員";
         }
+    }
+
+    _context.SaveChanges();
+
+    return Json(new { success = true, message = "昨天結束的會議成員已更新為普通成員。" });
+}
+
+[HttpPost]
+public IActionResult UpdateSpeakersForMeeting(int meetingId)
+{
+    var meeting = _context.Meetings.FirstOrDefault(m => m.ID == meetingId);
+    if (meeting == null)
+    {
+        return Json(new { success = false, message = "會議未找到。" });
+    }
+
+    var sessionUsers = _context.Sessionusers
+        .Where(s => s.MeetingID == meetingId && s.Speaker != "普通成員")
+        .ToList();
+
+    if (!sessionUsers.Any())
+    {
+        return Json(new { success = false, message = "會議成員無需更新。" });
+    }
+
+    foreach (var user in sessionUsers)
+    {
+        user.Speaker = "普通成員";
+    }
+
+    _context.SaveChanges();
+
+    return Json(new { success = true, message = $"會議 (ID: {meetingId}) 的成員已更新為普通成員。" });
+}
+
 
 
     [HttpGet]
@@ -29,22 +130,36 @@ namespace Heysundue.Controllers
         return RedirectToAction("Login2", "Home");
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Userlist2()
+[HttpGet]
+public async Task<IActionResult> Userlist2(int page = 1)
+{
+    int pageSize = 3;  // 每頁顯示 3 條記錄
+
+    var query = _context.Members.AsQueryable();
+    int totalRecords = await query.CountAsync();
+    int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+    var members = await query
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    var model = new Userlist2Model
     {
-        var model = new Userlist2Model
+        Members = members,
+        CurrentPage = page,
+        TotalPages = totalPages,
+        LevelOptions = new List<SelectListItem>
         {
-            Members = await _context.Members.ToListAsync(),
-            LevelOptions = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Root", Text = "Root" },
-                new SelectListItem { Value = "Admin", Text = "Admin" },
-                new SelectListItem { Value = "Member", Text = "Member" }
-            }
-        };
+            new SelectListItem { Value = "Root", Text = "Root" },
+            new SelectListItem { Value = "Admin", Text = "Admin" },
+            new SelectListItem { Value = "Member", Text = "Member" }
+        }
+    };
 
     return View(model);
-    }
+}
+
 
     
 [HttpPost]
@@ -88,7 +203,7 @@ public async Task<IActionResult> UpdateUser(int memberId)
     [HttpPost]
     public async Task<IActionResult> SearchUserlist2(string searchColumn, string searchKeyword, DateTime? searchDate, int page = 1)
     {
-    int pageSize = 10;  // 每頁顯示 10 條記錄
+    int pageSize = 3;  // 每頁顯示 10 條記錄
     var query = _context.Members.AsQueryable();
 
     // 日期篩選
@@ -257,14 +372,6 @@ public async Task<IActionResult> UpdateUser(int memberId)
             return View();
         }
 
-        public IActionResult Joinlist2(string searchColumn, string searchKeyword)
-        {
-            var model = new Joinlist2ViewModel
-            {
-                Joinlists = _context.Joinlists.ToList()
-            };
-            return View(model);
-        }
 
         public IActionResult Doorsystem2(string searchColumn, string searchKeyword)
         {
@@ -346,51 +453,6 @@ public async Task<IActionResult> UpdateUser(int memberId)
             return View(article);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SearchJoinlist(string searchColumn, string searchKeyword)
-        {
-            var query = _context.Joinlists.AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchColumn) && !string.IsNullOrEmpty(searchKeyword))
-            {
-                switch (searchColumn.ToLower())
-                {
-                    case "regno":
-                        query = query.Where(j => j.RegNo.Contains(searchKeyword));
-                        break;
-                    case "firstname":
-                        query = query.Where(j => j.FirstName.Contains(searchKeyword));
-                        break;
-                    case "lastname":
-                        query = query.Where(j => j.LastName.Contains(searchKeyword));
-                        break;
-                    case "chinesename":
-                        query = query.Where(j => j.ChineseName.Contains(searchKeyword));
-                        break;
-                    case "country":
-                        query = query.Where(j => j.Country.Contains(searchKeyword));
-                        break;
-                    case "registrationstatus":
-                        query = query.Where(j => j.RegistrationStatus.Contains(searchKeyword));
-                        break;
-                }
-            }
-
-            var joinlists = await query.ToListAsync();
-            return PartialView("_JoinlistTable", joinlists);
-        }
-        [HttpPost]
-        public async Task<IActionResult> Joinlist2(Joinlist2ViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Joinlists.Add(model.Joinlist);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Joinlist2");
-            }
-
-            return View(model);
-        }
 
         [HttpPost]
         public async Task<IActionResult> Doorsystem2(Doorsystem2ViewModel model)

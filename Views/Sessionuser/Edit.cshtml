@@ -1,0 +1,224 @@
+@model Heysundue.Models.Sessionuser
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container mt-3">
+    <!-- Top-right section for RegNo, ChineseName, and check-in status -->
+    <div class="d-flex justify-content-end">
+        <div class="text-end">
+            <div><strong>編號 (RegNo):</strong> @Model.RegNo</div>
+            <div><strong>中文姓名 (ChineseName):</strong> @Model.ChineseName</div>
+            <div>
+                <strong>報到狀態:</strong>
+                @if (Model.RegistrationStatus)
+                {
+                    <span class="text-success">已完成報到</span>
+                }
+                else
+                {
+                    <span class="text-danger">未完成報到</span>
+                }
+            </div>
+
+            <!-- Display temporary check-in/check-out message -->
+            @if (TempData["StatusMessage"] != null)
+            {
+                <div class="mt-2 alert alert-info">
+                    @TempData["StatusMessage"]
+                </div>
+            }
+
+            <!-- Check-in / Cancel check-in button -->
+        <form asp-action="ToggleCheckInStatus" method="post">
+            <input type="hidden" asp-for="ID" />
+            <button type="submit" name="status" value="True" class="btn btn-success mt-2"
+                @(Model.RegistrationStatus ? "style=display:none;" : "")>
+                報到
+            </button>
+            <button type="submit" name="status" value="False" class="btn btn-warning mt-2"
+                @(Model.RegistrationStatus ? "" : "style=display:none;")>
+                取消報到
+            </button>
+        </form>
+
+        </div>
+    </div>
+    <h2>Edit User</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="ID" />
+        <input type="hidden" asp-for="MeetingID" />
+        <input type="hidden" asp-for="RegNo" /> 
+
+        <!-- Registration Data Fields -->
+        <div class="form-group">
+            <label asp-for="FirstName" class="control-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="LastName" class="control-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ChineseName" class="control-label"></label>
+            <input asp-for="ChineseName" class="form-control" />
+            <span asp-validation-for="ChineseName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="City" class="control-label"></label>
+            <input asp-for="City" class="form-control" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Country" class="control-label"></label>
+            <input asp-for="Country" class="form-control" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IdentityType1" class="control-label"></label>
+            <input asp-for="IdentityType1" class="form-control" />
+            <span asp-validation-for="IdentityType1" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IdentityType2" class="control-label"></label>
+            <input asp-for="IdentityType2" class="form-control" />
+            <span asp-validation-for="IdentityType2" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Remark" class="control-label"></label>
+            <input asp-for="Remark" class="form-control" />
+            <span asp-validation-for="Remark" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IDNumber" class="control-label"></label>
+            <input asp-for="IDNumber" class="form-control" />
+            <span asp-validation-for="IDNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Speaker" class="control-label">角色</label>
+            <select asp-for="Speaker" class="form-select">
+                <option value="">請選擇角色</option>
+                <option value="普通成員">普通成員</option>
+                <option value="演講人">演講人</option>
+            </select>
+            <span asp-validation-for="Speaker" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group">
+            <label asp-for="Phone" class="control-label"></label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Sessionuser" class="btn btn-secondary">Cancel</a>
+    </form>
+
+    <!-- Additional Buttons for ID Card and Certificate Card -->
+    <div class="mt-3">
+        <button type="button" class="btn btn-info" onclick="window.location.href='@Url.Action("GenerateIdCard", "Sessionuser", new { id = Model.ID })'">
+            ID Card
+        </button>
+        <button type="button" class="btn btn-info" onclick="window.location.href='@Url.Action("GenerateCertificateCard", "Sessionuser", new { id = Model.ID })'">
+            Certificate Card
+        </button>
+    </div>
+</div>
+<!-- Remark 彈出視窗 -->
+<div id="remarkModal" class="remark-modal">
+    <div class="remark-modal-content">
+        <p id="remarkText" style="font-size: 20px; font-weight: bold;"></p>
+        <button class="confirm-button" onclick="closeRemarkModal()">確定</button>
+    </div>
+</div>
+
+<!-- CSS 樣式 -->
+<style>
+/* 彈出視窗背景樣式 */
+.remark-modal {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* 彈出視窗內容樣式 */
+.remark-modal-content {
+    background-color: white;
+    padding: 40px; /* 增加內邊距 */
+    border-radius: 12px; /* 更大的邊角圓滑效果 */
+    text-align: center;
+    width: 500px; /* 增加寬度 */
+    position: relative;
+    transform: scale(1.2); /* 放大視窗 */
+}
+
+/* 確定按鈕樣式 */
+.confirm-button {
+    margin-top: 20px;
+    padding: 15px 30px; /* 增大按鈕尺寸 */
+    font-size: 18px; /* 增大字體 */
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px; /* 圓角更明顯 */
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background-color: #0056b3;
+}
+
+/* 顯示的文字樣式 */
+#remarkText {
+    font-size: 28px; /* 增大字體 */
+    font-weight: bold;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+    // 開啟彈出視窗並顯示 Remark
+    function openRemarkModal(text) {
+        document.getElementById("remarkText").textContent = text;
+        document.getElementById("remarkModal").style.display = "flex";
+    }
+
+    // 關閉彈出視窗
+    function closeRemarkModal() {
+        document.getElementById("remarkModal").style.display = "none";
+    }
+
+    // 在頁面加載時檢查 Remark 是否有值，並顯示彈出視窗
+    window.onload = function() {
+        var remark = '@Html.Raw(Model.Remark)'; // 使用 Html.Raw 解碼特殊字符
+        if (remark) {
+            openRemarkModal(remark);
+        }
+    };
+</script>

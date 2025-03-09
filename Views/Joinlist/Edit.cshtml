@@ -1,0 +1,156 @@
+@model Heysundue.Models.Joinlist
+
+<div class="container mt-3">
+    <h2>Edit Joinlist</h2>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="ID" />
+
+        <div class="form-group">
+            <label asp-for="RegNo" class="control-label"></label>
+            <input asp-for="RegNo" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="FirstName" class="control-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="LastName" class="control-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ChineseName" class="control-label"></label>
+            <input asp-for="ChineseName" class="form-control" />
+            <span asp-validation-for="ChineseName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="City" class="control-label"></label>
+            <input asp-for="City" class="form-control" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Country" class="control-label"></label>
+            <input asp-for="Country" class="form-control" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IdentityType1" class="control-label"></label>
+            <input asp-for="IdentityType1" class="form-control" />
+            <span asp-validation-for="IdentityType1" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IdentityType2" class="control-label"></label>
+            <input asp-for="IdentityType2" class="form-control" />
+            <span asp-validation-for="IdentityType2" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IDNumber" class="control-label"></label>
+            <input asp-for="IDNumber" class="form-control" />
+            <span asp-validation-for="IDNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Remark" class="control-label"></label>
+            <input asp-for="Remark" class="form-control" />
+            <span asp-validation-for="Remark" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Speaker" class="control-label">角色</label>
+            <select asp-for="Speaker" class="form-select">
+                <option value="">請選擇角色</option>
+                <option value="普通成員">普通成員</option>
+                <option value="演講人">演講人</option>
+            </select>
+            <span asp-validation-for="Speaker" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Joinlist2" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<!-- Remark 彈出視窗 -->
+<div id="remarkModal" class="remark-modal">
+    <div class="remark-modal-content">
+        <p id="remarkText" style="font-size: 20px; font-weight: bold;"></p>
+        <button class="confirm-button" onclick="closeRemarkModal()">確定</button>
+    </div>
+</div>
+
+<!-- CSS 樣式 -->
+<style>
+/* 彈出視窗背景樣式 */
+.remark-modal {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* 彈出視窗內容樣式 */
+.remark-modal-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 500px;
+    position: relative;
+    transform: scale(1.2);
+}
+
+/* 確定按鈕樣式 */
+.confirm-button {
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background-color: #0056b3;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+    function openRemarkModal(text) {
+        document.getElementById("remarkText").textContent = text;
+        document.getElementById("remarkModal").style.display = "flex";
+    }
+
+    function closeRemarkModal() {
+        document.getElementById("remarkModal").style.display = "none";
+    }
+
+    window.onload = function () {
+        var remark = '@Html.Raw(Model.Remark ?? "")';
+        if (remark) {
+            openRemarkModal(remark);
+        }
+    };
+</script>

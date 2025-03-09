@@ -22,14 +22,7 @@
             </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-3">
-                <!-- 新增日期選擇器 -->
-                <label for="searchDate" class="form-label">選擇開始日期：</label>
-                <input type="date" id="searchDate" class="form-control">
-            </div>
-        </div>
-
+        <!-- 搜尋表單 -->
         <div class="row mb-3">
             <div class="col-2">
                 <select id="searchColumn" class="form-select text-uppercase bg-light">
@@ -49,12 +42,9 @@
                 <button class="btn btn-primary" onclick="searchKeyword()">搜尋</button>
                 <button class="btn btn-secondary" onclick="clearSearch()">清除搜尋條件</button>
             </div>
-            <div class="col-auto">
-                <!-- 顯示目前頁數 -->
-                <p>目前頁數: <span id="currentPage">@Model.CurrentPage</span> / <span id="totalPages">@Model.TotalPages</span></p>
-            </div>
         </div>
 
+        <!-- 用戶表格 -->
         <div class="row mb-3">
             <div class="col">
                 <form id="editMembersForm" method="post" asp-action="UpdateUser" asp-controller="Home">
@@ -76,7 +66,7 @@
                             {
                                 <tr>
                                     <td>@member.ID</td>
-                                    <td>@member.Date?.ToString("yyyy-MM-dd")</td> <!-- 這裡顯示創建日期 -->
+                                    <td>@member.Date?.ToString("yyyy-MM-dd")</td>
                                     <td><input type="text" name="userName_@member.ID" value="@member.UserName" class="form-control" /></td>
                                     <td><input type="text" name="userPassword_@member.ID" value="@member.UserPassword" class="form-control" /></td>
                                     <td><input type="text" name="phone_@member.ID" value="@member.Phone" class="form-control" /></td>
@@ -106,86 +96,87 @@
                 </form>
             </div>
         </div>
+
+        <!-- 分頁導航 -->
         <div class="row mb-3">
-    <div class="col">
-        <!-- 分頁導航按鈕 -->
-        <button class="btn btn-primary" onclick="navigatePage(@Model.CurrentPage - 1)" @(Model.CurrentPage == 1 ? "disabled" : "")>上一頁</button>
-        <button class="btn btn-primary" onclick="navigatePage(@Model.CurrentPage + 1)" @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")>下一頁</button>
-    </div>
-</div>
+            <div class="col text-center">
+                <button class="btn btn-primary" onclick="navigatePage(@Model.CurrentPage - 1)" @(Model.CurrentPage == 1 ? "disabled" : "")>上一頁</button>
+                <p>目前頁數: <span id="currentPage">@Model.CurrentPage</span> / <span id="totalPages">@Model.TotalPages</span></p>
+                <button class="btn btn-primary" onclick="navigatePage(@Model.CurrentPage + 1)" @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")>下一頁</button>
+            </div>
+        </div>
     </div>
 
-    
     <script>
-    document.getElementById("searchColumn").addEventListener("change", function() {
-        var column = this.value;
-        var searchKeywordContainer = document.getElementById("searchKeywordContainer");
+function searchKeyword(page = 1) {
+    var column = document.getElementById("searchColumn").value;
+    var keyword = document.getElementById("searchKeyword").value;
+    var date = document.getElementById("searchDate").value;  // 獲取選定的日期
 
-        if (column === "level") {
-            // 當選擇到Level時，將input轉換成select
-            searchKeywordContainer.innerHTML = `
-                <select id="searchKeyword" class="form-select">
-                    <option value="Member">Member</option>
-                    <option value="Root">Root</option>
-                    <option value="Admin">Admin</option>
-                </select>
-            `;
-        } else {
-            // 其他欄位維持input文字框
-            searchKeywordContainer.innerHTML = `<input type="text" id="searchKeyword" class="form-control">`;
+    $.ajax({
+        url: '@Url.Action("SearchUserlist2", "Home")',
+        type: 'POST',
+        data: {
+            searchColumn: column,
+            searchKeyword: keyword,
+            searchDate: date,
+            page: page  // 傳遞頁數給後端
+        },
+        success: function(response) {
+            $('#memberTableBody').html(response.tableHtml); // 更新表格
+            updatePagination(response.currentPage, response.totalPages);  // 更新分頁資訊
+        },
+        error: function(xhr, status, error) {
+            console.log("Error: " + error);
         }
     });
+}
 
-    function searchKeyword(page = 1) {
-        var column = document.getElementById("searchColumn").value;
-        var keyword = document.getElementById("searchKeyword").value;
-        var date = document.getElementById("searchDate").value;  // 獲取選定的日期
-
-        $.ajax({
-            url: '@Url.Action("SearchUserlist2", "Home")',
-            type: 'POST',
-            data: {
-                searchColumn: column,
-                searchKeyword: keyword,
-                searchDate: date,
-                page: page  // 傳遞頁數給後端
-            },
-            success: function(data) {
-                $('#memberTableBody').html(data); // 更新表格
-            },
-            error: function(xhr, status, error) {
-                console.log("Error: " + error);
-            }
-        });
-    }
 
     function navigatePage(page) {
-        // 確保頁數合法
-        var currentPage = parseInt(document.getElementById("currentPage").innerText);
-        var totalPages = parseInt(document.getElementById("totalPages").innerText);
+    var currentPageElement = document.getElementById("currentPage");
+    var totalPagesElement = document.getElementById("totalPages");
 
-        if (page >= 1 && page <= totalPages) {
-            searchKeyword(page);  // 重新搜尋，載入新頁面
-        }
+    if (!currentPageElement || !totalPagesElement) {
+        console.error("currentPage 或 totalPages 元素未找到");
+        return;
     }
+
+    var currentPage = parseInt(currentPageElement.innerText);
+    var totalPages = parseInt(totalPagesElement.innerText);
+
+    // 確保頁數合法
+    if (page >= 1 && page <= totalPages) {
+        searchKeyword(page);  // 重新搜尋，載入新頁面
+    }
+}
+
+
+ function updatePagination(currentPage, totalPages) {
+    if (!currentPage || !totalPages) {
+        console.error("currentPage 或 totalPages 未正確傳遞");
+        return;
+    }
+
+    // 更新頁數顯示
+    document.getElementById("currentPage").innerText = currentPage;
+    document.getElementById("totalPages").innerText = totalPages;
+
+    // 更新按鈕狀態
+    document.querySelector(".btn-primary:first-child").disabled = currentPage <= 1;
+    document.querySelector(".btn-primary:last-child").disabled = currentPage >= totalPages;
+}
+
 
 
     function clearSearch() {
-        // 重置搜尋欄位選擇和輸入框內容
-        document.getElementById("searchColumn").value = "all"; // 重置搜尋欄位
-        document.getElementById("searchKeywordContainer").innerHTML = `<input type="text" id="searchKeyword" class="form-control">`; // 重置關鍵字
-        document.getElementById("searchDate").value = "";  // 清空日期選擇器
-
-        // 可以選擇要不要發送空的搜尋來重置表格內容
-        searchKeyword(); // 若要保留搜尋結果，則可移除這一行
+        document.getElementById("searchColumn").value = "all";
+        document.getElementById("searchKeyword").value = "";
+        searchKeyword();
     }
     </script>
 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

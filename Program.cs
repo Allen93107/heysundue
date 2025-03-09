@@ -30,11 +30,15 @@ builder.Services.AddDbContext<ArticleContext>(options =>
     }
 });
 
+
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!env.IsDevelopment())

@@ -14,7 +14,7 @@ namespace Heysundue.Migrations.Article
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("Heysundue.Models.Accessdoor", b =>
                 {
@@ -108,10 +108,19 @@ namespace Heysundue.Migrations.Article
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Barcode")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ChineseName")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("City")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Country")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("EndDate")
@@ -120,24 +129,37 @@ namespace Heysundue.Migrations.Article
                     b.Property<string>("FirstName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("JoinlistID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("IDNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IdentityType1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IdentityType2")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RegNo")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RegistrationStatus")
+                    b.Property<bool>("RegistrationStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Speaker")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("JoinlistID");
 
                     b.ToTable("Joinlists");
                 });
@@ -153,6 +175,31 @@ namespace Heysundue.Migrations.Article
                         .HasColumnType("TEXT");
 
                     b.ToTable("Login");
+                });
+
+            modelBuilder.Entity("Heysundue.Models.Meeting", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("MeetingDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Place")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Meetings");
                 });
 
             modelBuilder.Entity("Heysundue.Models.Member", b =>
@@ -236,6 +283,73 @@ namespace Heysundue.Migrations.Article
                     b.ToTable("Registrations");
                 });
 
+            modelBuilder.Entity("Heysundue.Models.Sessionuser", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Barcode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ChineseName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IDNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IdentityType1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IdentityType2")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("MeetingID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RegNo")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("RegistrationStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Speaker")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("MeetingID");
+
+                    b.ToTable("Sessionusers");
+                });
+
             modelBuilder.Entity("Heysundue.Models.Accessdoor", b =>
                 {
                     b.HasOne("Heysundue.Models.Accessdoor", null)
@@ -243,11 +357,12 @@ namespace Heysundue.Migrations.Article
                         .HasForeignKey("AccessdoorID");
                 });
 
-            modelBuilder.Entity("Heysundue.Models.Joinlist", b =>
+            modelBuilder.Entity("Heysundue.Models.Sessionuser", b =>
                 {
-                    b.HasOne("Heysundue.Models.Joinlist", null)
-                        .WithMany("AllJoinlist")
-                        .HasForeignKey("JoinlistID");
+                    b.HasOne("Heysundue.Models.Meeting", null)
+                        .WithMany("Sessionusers")
+                        .HasForeignKey("MeetingID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Heysundue.Models.Accessdoor", b =>
@@ -255,9 +370,9 @@ namespace Heysundue.Migrations.Article
                     b.Navigation("AllAccessdoor");
                 });
 
-            modelBuilder.Entity("Heysundue.Models.Joinlist", b =>
+            modelBuilder.Entity("Heysundue.Models.Meeting", b =>
                 {
-                    b.Navigation("AllJoinlist");
+                    b.Navigation("Sessionusers");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,12 @@
+@model Heysundue.Models.SessionuserViewModel
+
+<div class="col text-center">
+    <button class="btn btn-primary" onclick="previousPage()" @(Model.CurrentPage <= 1 ? "disabled" : "")>上一頁</button>
+    <span>頁數: @Model.CurrentPage / @Model.TotalPages</span>
+    <button class="btn btn-primary" onclick="nextPage()" @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")>下一頁</button>
+</div>
+
+
+
+
+

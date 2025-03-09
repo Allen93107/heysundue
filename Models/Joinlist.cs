@@ -1,10 +1,8 @@
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Heysundue.Models
 {
- 
- 
     public class Joinlist
     {
         public int ID { get; set; }
@@ -13,6 +11,7 @@ namespace Heysundue.Models
 
         public DateTime EndDate { get; set; }
 
+        public string? Barcode { get; set; }
 
         public string? RegNo { get; set; }
 
@@ -22,11 +21,24 @@ namespace Heysundue.Models
 
         public string? ChineseName { get; set; }
 
+        public string? Email { get; set; }
+
+        public string? City { get; set; }
+
         public string? Country { get; set; }
 
-        public string? RegistrationStatus { get; set; }
+        public bool RegistrationStatus { get; set; } = false;
 
-        public IList<Joinlist> AllJoinlist { get; set; } = new List<Joinlist>();
+        public string? IdentityType1 { get; set; }
 
+        public string? IdentityType2 { get; set; }
+
+        public string? IDNumber { get; set; }
+
+        public string? Remark { get; set; }
+
+        public string? Speaker { get; set; } = "普通成員";
+
+        public string? Phone { get; set; }
     }
 }

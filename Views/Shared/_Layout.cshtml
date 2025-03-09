@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Heysundue.styles.css" asp-append-version="true" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -28,61 +30,55 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index2">Index</a>
                         </li>
-                        
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login2">Login</a>
                         </li>
-
-                        
-
-                        @if(currentUserRole == "Root")
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SetDate">研討會日期設定</a>
-                            </li>
-                            <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Inputuser2">Inputuser2</a>
-                             </li>
-                            //<li class="nav-item">
-                            //   <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SetDate3">研討會日期設定3</a>
-                            //</li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login2">系統管理(無功能展示用)</a>
-                            </li>
-                            <li class="nav-item">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Excel" asp-action="Upload">Upload Excel</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="UserList2">UserList2</a>
                         </li>
-                        }
-
-                        @if(currentUserRole == "Admin" || currentUserRole == "Root")
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login2">管理控制台(無功能展示用)</a>
-                            </li>
-                            <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Banner" asp-action="Banner2">Banner</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Joinlist2">Joinlist</a>
-                            </li>
-                        }
-
-                        @if(currentUserRole == "Member" || currentUserRole == "Admin" || currentUserRole == "Root")
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Registration2">Registration</a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Accessdoor2">Accessdoor</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Doorsystem2">Doorsystem</a>
-                            </li>
-                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Sessionuser" asp-action="Sessionuser">會議名單</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Sessionuser" asp-action="Sessionregister">報名名單</a>
+                        </li>
                     </ul>
-
-                    <!-- 新增登出按钮 -->
+                    @if(currentUserRole == "Root")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Inputuser2">Inputuser2</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login2">系統管理(無功能展示用)</a>
+                        </li>
+                    }
+                    @if(currentUserRole == "Admin" || currentUserRole == "Root")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login2">管理控制台(無功能展示用)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Banner" asp-action="Banner2">Banner</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Joinlist" asp-action="Joinlist2">Joinlist</a>
+                        </li>
+                    }
+                    @if(currentUserRole == "Member" || currentUserRole == "Admin" || currentUserRole == "Root")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Registration2">Registration</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Accessdoor2">Accessdoor</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Doorsystem2">Doorsystem</a>
+                        </li>
+                    }
                     <ul class="navbar-nav">
                         @if(currentUserRole != "Guest")
                         {
@@ -100,7 +96,6 @@
             @RenderBody()
         </main>
     </div>
-
     <footer>
         <div class="footer">
             <div class="container">
@@ -119,12 +114,114 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+<div id="upcomingMeetingsContainer" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 300px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9;">
+    <h5>即將開始的會議</h5>
+    <div id="meetingDetails">目前無會議。</div>
+</div>
+
+<script>
+let meetingData = [];
+
+// 更新倒數計時
+function updateCountdown() {
+    const now = new Date();
+
+    meetingData.forEach(meeting => {
+        const meetingTime = new Date(meeting.meetingDateTime);
+        const timeLeft = (meetingTime - now) / 1000;
+
+        if (timeLeft > 0) {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = Math.floor(timeLeft % 60);
+
+            meeting.countdown = `${hours}時 ${minutes}分 ${seconds}秒`;
+        } else if (timeLeft <= 0 && meetingTime.toDateString() === now.toDateString()) {
+            meeting.countdown = "會議正在進行中！";
+        } else {
+            meeting.countdown = "會議已結束！";
+        }
+    });
+
+    renderMeetings();
+}
+
+// 渲染會議信息
+function renderMeetings() {
+    const meetingDetailsElement = document.getElementById('meetingDetails');
+    if (!meetingDetailsElement) {
+        console.error("找不到 #meetingDetails 元素！");
+        return;
+    }
+
+    if (meetingData.length > 0) {
+        let meetingDetails = "";
+
+        meetingData.forEach(meeting => {
+            if (new Date(meeting.meetingDateTime).toDateString() === new Date().toDateString()) {
+                meetingDetails += `
+                    <p><strong>會議名稱：</strong>${meeting.title}</p>
+                    <p><strong>時間：</strong>${new Date(meeting.meetingDateTime).toLocaleString()}</p>
+                    <p><strong>地點：</strong>${meeting.place}</p>
+                    <p><strong>主講人：</strong>${meeting.speaker?.chineseName || "未知"}</p>
+                    <p><strong>聯絡電話：</strong>${meeting.speaker?.phone || "未知"}</p>
+                    <p><strong>倒數計時：</strong>${meeting.countdown}</p>
+                    <hr />
+                `;
+            }
+        });
+
+        meetingDetailsElement.innerHTML = meetingDetails || "<p>今天沒有會議。</p>";
+    } else {
+        meetingDetailsElement.innerHTML = "<p>今天沒有會議。</p>";
+    }
+}
+
+   function checkUpcomingMeetings() {
+        console.log("正在檢查即將開始的會議...");
+        $.getJSON('/Home/CheckUpcomingMeetings', function (data) {
+            console.log("接收到的資料:", data);
+
+            if (data && data.length > 0) {
+                meetingData = data.map(meeting => ({
+                    ...meeting,
+                    countdown: ""
+                }));
+                updateCountdown();
+            } else {
+                console.log("無即將開始的會議");
+                meetingData = [];
+                renderMeetings();
+            }
+        }).fail(function (jqXHR) {
+            if (jqXHR.status !== 204) {
+                console.error("檢查即將開始的會議失敗:", jqXHR.statusText);
+            }
+        });
+    }
+function updateSpeakersForMeeting(meetingId) {
+    console.log(`正在更新會議 (ID: ${meetingId}) 的成員...`);
+    $.post('/Home/UpdateSpeakersForMeeting', { meetingId: meetingId }, function (response) {
+        if (response.success) {
+            console.log(response.message);
+            // 從會議數據中移除已更新的會議
+            meetingData = meetingData.filter(meeting => meeting.id !== meetingId);
+        } else {
+            console.warn(response.message);
+        }
+    }).fail(function (jqXHR) {
+        console.error("更新會議成員失敗:", jqXHR.statusText);
+    });
+}
+
+// 每秒檢查倒數計時
+setInterval(updateCountdown, 1000);
+
+// 初始化檢查
+checkUpcomingMeetings();
+
+</script>
 </body>
 </html>
